@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -8,10 +8,25 @@ import {
   YAxis,
   Tooltip,
   Legend,
+  ResponsiveContainer
 } from "recharts";
-import { DashboardContainer, ContentWrapper, DashboardContent } from "./styles";
+import {
+  DashboardContainer,
+  ContentWrapper,
+  DashboardContent,
+  TableContainer,
+  Table,
+  TableHeader,
+  TableCell,
+  PaginationContainer,
+  PaginationButton,
+  PageInfo
+} from "./styles";
 
 const Dashboard = ({ licitacoes, activeSection }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
   useEffect(() => {
     console.log('Licitacoes recebidas:', licitacoes);
   }, [licitacoes]);
@@ -75,6 +90,20 @@ const Dashboard = ({ licitacoes, activeSection }) => {
     return tickItem;
   };
 
+  const totalPages = Math.ceil(licitacoes.length / itemsPerPage);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = licitacoes.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+  };
+
   return (
     <DashboardContainer>
       <ContentWrapper>
@@ -82,62 +111,81 @@ const Dashboard = ({ licitacoes, activeSection }) => {
           {activeSection === 'buscar-valores-por-ano' && (
             <>
               <h2>Soma de Valores por Ano</h2>
-              <BarChart width={600} height={300} data={somaData}>
-                <XAxis dataKey='ano' />
-                <YAxis tickFormatter={formatYAxis} />
-                <Tooltip formatter={(value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} />
-                <Legend />
-                <Bar dataKey='total' fill='#176848' />
-              </BarChart>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={somaData}>
+                  <XAxis dataKey='ano' />
+                  <YAxis tickFormatter={formatYAxis} />
+                  <Tooltip formatter={(value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} />
+                  <Legend />
+                  <Bar dataKey='total' fill='#176848' />
+                </BarChart>
+              </ResponsiveContainer>
               <h2>Quantidade de Licitações por Unidade</h2>
-              <PieChart width={600} height={300}>
-                <Pie
-                  data={unidadeData}
-                  dataKey='quantidade'
-                  nameKey='unidade'
-                  cx='50%'
-                  cy='50%'
-                  outerRadius={100}
-                  fill='#5225AF'
-                  label
-                />
-                <Tooltip />
-              </PieChart>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={unidadeData}
+                    dataKey='quantidade'
+                    nameKey='unidade'
+                    cx='50%'
+                    cy='50%'
+                    outerRadius={100}
+                    fill='#5225AF'
+                    label
+                  />
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
             </>
           )}
           {activeSection === 'buscar-status-licitacao' && (
             <>
               <h2>Status das Licitações</h2>
-              <BarChart width={1500} height={450} data={statusData}>
-                <XAxis dataKey='status' />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar name='Quantidade' dataKey='quantidade' fill='#176848' />
-              </BarChart>
+              <ResponsiveContainer width="100%" height={450}>
+                <BarChart data={statusData}>
+                  <XAxis dataKey='status' hide />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar name='Quantidade' dataKey='quantidade' fill='#176848' />
+                </BarChart>
+              </ResponsiveContainer>
             </>
           )}
           {activeSection === 'buscar-licitacoes-por-data' && (
             <>
               <h2>Resultados da Busca por Data</h2>
-              <table style = {{width: '100%', borderCollapse: 'collapse'}}>
-                <thead>
-                  <tr>
-                    <th style={{ border: '1px solid black', padding: '8px' }}>Numero Processo</th>
-                    <th style={{ border: '1px solid black', padding: '8px' }}>Objeto</th>
-                    <th style={{ border: '1px solid black', padding: '8px' }}>Valor</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {licitacoes.map((licitacao) => (
-                    <tr key={licitacao.NUMERO_PROCESSO}>
-                      <td style={{ border: '1px solid black', padding: '8px' }}>{licitacao.NUMERO_PROCESSO}</td>
-                      <td style={{ border: '1px solid black', padding: '8px' }}>{licitacao.OBJETO}</td>
-                      <td style={{ border: '1px solid black', padding: '8px' }}>{licitacao.VALOR_TOTAL_DESPESA}</td>
+              <TableContainer>
+                <Table>
+                  <thead>
+                    <tr>
+                      <TableHeader>Numero Processo</TableHeader>
+                      <TableHeader>Objeto</TableHeader>
+                      <TableHeader>Valor</TableHeader>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {currentItems.map((licitacao) => (
+                      <tr key={licitacao.NUMERO_PROCESSO}>
+                        <TableCell>{licitacao.NUMERO_PROCESSO}</TableCell>
+                        <TableCell>{licitacao.OBJETO}</TableCell>
+                        <TableCell>{licitacao.VALOR_TOTAL_DESPESA}</TableCell>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </TableContainer>
+              {licitacoes.length > itemsPerPage && (
+                <PaginationContainer>
+                  <PaginationButton onClick={handlePreviousPage} disabled={currentPage === 1}>
+                    Anterior
+                  </PaginationButton>
+                  <PageInfo> Página {currentPage} de {totalPages} </PageInfo>
+                  <PaginationButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+                    Próxima
+                  </PaginationButton>
+                </PaginationContainer>
+              )}
             </>
           )}
         </DashboardContent>

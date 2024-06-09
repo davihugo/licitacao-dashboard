@@ -6,7 +6,6 @@ export const Container = styled.div`
   justify-content: space-between;
   align-items: center;
   background-color: #204263;
-  padding: 0 20px;
   box-shadow: 0 0 20px 3px;
 
   @media (max-width: 768px) {

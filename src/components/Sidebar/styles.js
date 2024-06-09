@@ -1,18 +1,51 @@
 import styled from 'styled-components';
 
+
+
 export const Container = styled.div`
   background-color: #204263;
   position: fixed;
   height: 100%;
+  font-size: 30px;
   top: 0;
   left: 0;
   width: 300px;
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 100; 
+  &.open {
+    transform: translateX(0);
+    z-index: 101; 
+  }
+
+  @media (min-width: 769px) {
+    transform: translateX(0);
+  }
+
+  font-size: 30px;
+
+`;
+
+export const MenuIcon = styled.div`
+  position: fixed;
+  
+  top: 20px;
+  left: 20px;
+  font-size: 30px;
+  color: white;
+  cursor: pointer;
+  z-index: 1000;
+  
+  @media (min-width: 769px) {
+    display: none;
+  }
 `;
 
 export const Content = styled.div`
   margin-top: 23px;
+  
 `;
 
 export const Profile = styled.div`

@@ -24,6 +24,16 @@ function App() {
       .catch((error) => console.error("Erro ao buscar dados:", error));
   }, []);
 
+  const formatDate = (date) => {
+    const [year, month, day] = date.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
+  const parseDate = (date) => {
+    const [day, month, year] = date.split("/");
+    return `${year}-${month}-${day}`;
+  };
+
   const handleFilter = () => {
     let filtered = [];
     switch (activeSection) {
@@ -32,13 +42,15 @@ function App() {
           const ano = parseInt(item.EXERCICIO);
           return ano >= parseInt(startDate) && ano <= parseInt(endDate);
         });
+        setStartDate("");
+        setEndDate("");
         break;
       case "buscar-licitacoes-por-data":
         filtered = licitacoes.filter((item) => {
           const dataAbertura = new Date(item.DATA_ABERTURA);
           return (
-            dataAbertura >= new Date(startDate) &&
-            dataAbertura <= new Date(endDate)
+            dataAbertura >= new Date(parseDate(startDate)) &&
+            dataAbertura <= new Date(parseDate(endDate))
           );
         });
         break;
@@ -47,8 +59,8 @@ function App() {
           const dataPublicacao = new Date(item.DATA_PUBLICACAO);
           return (
             item.STATUS_LICITACAO_NOME.includes(status) &&
-            dataPublicacao >= new Date(startDate) &&
-            dataPublicacao <= new Date(endDate)
+            dataPublicacao >= new Date(parseDate(startDate)) &&
+            dataPublicacao <= new Date(parseDate(endDate))
           );
         });
         break;
@@ -57,15 +69,12 @@ function App() {
         break;
     }
     setFilteredLicitacoes(filtered);
-    setStartDate("");
-    setEndDate("");
-    setStatus("");
   };
 
   return (
     <div className="App" style={{ display: "flex" }}>
       <Sidebar setActiveSection={setActiveSection} />
-      <div style={{ marginLeft: "300px", width: "100%" }}>
+      <div style={{width: "100%" }}>
         <Header />
 
         {activeSection !== "home" && (
@@ -98,17 +107,19 @@ function App() {
                 <label>
                   Data Inicial:
                   <input
-                    type="date"
+                    type="text"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
+                    placeholder="dd/mm/yyyy"
                   />
                 </label>
                 <label>
                   Data Final:
                   <input
-                    type="date"
+                    type="text"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
+                    placeholder="dd/mm/yyyy"
                   />
                 </label>
               </>
@@ -145,10 +156,16 @@ function App() {
           <div className="no-results">SEM RESULTADOS, TENTE NOVAMENTE</div>
         )}
 
-        <Dashboard
-          licitacoes={filteredLicitacoes}
-          activeSection={activeSection}
-        />
+        {activeSection !== "home" && (
+          <Dashboard
+            licitacoes={filteredLicitacoes.map((item) => ({
+              ...item,
+              DATA_PUBLICACAO: formatDate(item.DATA_PUBLICACAO),
+              DATA_ABERTURA: formatDate(item.DATA_ABERTURA),
+            }))}
+            activeSection={activeSection}
+          />
+        )}
       </div>
     </div>
   );
