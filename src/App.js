@@ -116,8 +116,14 @@ function App() {
 
   const secretariaMaisLicitacoesNome = Object.keys(secretariaMaisLicitacoes).reduce((a, b) => secretariaMaisLicitacoes[a] > secretariaMaisLicitacoes[b] ? a : b, '');
 
-  const valorMedioLicitacoes = (licitacoes.reduce((acc, licitacao) => acc + parseFloat(licitacao.VALOR_TOTAL_DESPESA), 0) / totalLicitacoes).toFixed(2);
 
+  const valorMedioLicitacoes = totalLicitacoes > 0 
+    ? (licitacoes.reduce((acc, licitacao) => {
+        const valor = parseFloat(licitacao.VALOR_TOTAL_DESPESA);
+        return acc + (isNaN(valor) ? 0 : valor);
+      }, 0) / totalLicitacoes).toFixed(2)
+    : '0.00';
+  
   const statusPorcentagem = licitacoes.reduce((acc, licitacao) => {
     const status = licitacao.STATUS_LICITACAO_NOME;
     if (!acc[status]) {
@@ -152,7 +158,7 @@ function App() {
             <HomeContainer>
               <Card title="Número de Licitações" value={totalLicitacoes} />
               <Card title="Secretaria com Mais Licitações" value={secretariaMaisLicitacoesNome} />
-              <Card title="Valor Médio das Licitações" value={`R$ ${valorMedioLicitacoes}`} />
+              <Card title="Valor Médio das Licitações" value={`R$ ${valorMedioLicitacoes || '0.00'}`} />
               <Card title="Status das Licitações" value={
                 <PieChart width={200} height={200}>
                   <Pie
