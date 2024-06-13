@@ -4,6 +4,23 @@ import Header from "./components/Header";
 import axios from "axios";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
+import Card from "./components/Cards";
+import styled from 'styled-components';
+import { PieChart, Pie, Tooltip, Cell } from "recharts";
+
+const HomeContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-left: 200px;
+`;
+
+const WelcomeMessage = styled.div`
+  text-align: center;
+  margin: 20px;
+`;
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 function App() {
   const [licitacoes, setLicitacoes] = useState([]);
@@ -23,6 +40,13 @@ function App() {
       })
       .catch((error) => console.error("Erro ao buscar dados:", error));
   }, []);
+
+  useEffect(() => {
+    setStartDate("");
+    setEndDate("");
+    setStatus("");
+    setFilteredLicitacoes(licitacoes);
+  }, [activeSection, licitacoes]);
 
   const formatDate = (date) => {
     const [year, month, day] = date.split("-");
@@ -71,11 +95,84 @@ function App() {
     setFilteredLicitacoes(filtered);
   };
 
+  const handleSectionChange = (section) => {
+    setActiveSection(section);
+    setStartDate("");
+    setEndDate("");
+    setStatus("");
+    setFilteredLicitacoes(licitacoes);
+  };
+
+  const totalLicitacoes = licitacoes.length;
+
+  const secretariaMaisLicitacoes = licitacoes.reduce((acc, licitacao) => {
+    const secretaria = licitacao.UNIDADE_NOME;
+    if (!acc[secretaria]) {
+      acc[secretaria] = 0;
+    }
+    acc[secretaria]++;
+    return acc;
+  }, {});
+
+  const secretariaMaisLicitacoesNome = Object.keys(secretariaMaisLicitacoes).reduce((a, b) => secretariaMaisLicitacoes[a] > secretariaMaisLicitacoes[b] ? a : b, '');
+
+  const valorMedioLicitacoes = (licitacoes.reduce((acc, licitacao) => acc + parseFloat(licitacao.VALOR_TOTAL_DESPESA), 0) / totalLicitacoes).toFixed(2);
+
+  const statusPorcentagem = licitacoes.reduce((acc, licitacao) => {
+    const status = licitacao.STATUS_LICITACAO_NOME;
+    if (!acc[status]) {
+      acc[status] = 0;
+    }
+    acc[status]++;
+    return acc;
+  }, {});
+
+  const statusData = Object.keys(statusPorcentagem).map((status, index) => ({
+    name: status,
+    value: statusPorcentagem[status],
+    fill: COLORS[index % COLORS.length]
+  }));
+
   return (
     <div className="App" style={{ display: "flex" }}>
-      <Sidebar setActiveSection={setActiveSection} />
-      <div style={{width: "100%" }}>
+      <Sidebar setActiveSection={handleSectionChange} />
+      <div style={{ width: "100%" }}>
         <Header />
+
+        {activeSection === "home" && (
+          <>
+            <WelcomeMessage>
+              <h1 className="home-title">Bem-vindo ao seu Dashboard!</h1>
+              <p className="home-description">
+                Aqui você pode visualizar e filtrar licitações de acordo com os
+                critérios desejados. Use a barra lateral para navegar entre as
+                seções.
+              </p>
+            </WelcomeMessage>
+            <HomeContainer>
+              <Card title="Número de Licitações" value={totalLicitacoes} />
+              <Card title="Secretaria com Mais Licitações" value={secretariaMaisLicitacoesNome} />
+              <Card title="Valor Médio das Licitações" value={`R$ ${valorMedioLicitacoes}`} />
+              <Card title="Status das Licitações" value={
+                <PieChart width={200} height={200}>
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label
+                    dataKey="value"
+                  >
+                    {statusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              } />
+            </HomeContainer>
+          </>
+        )}
 
         {activeSection !== "home" && (
           <div className="filter-container">
@@ -138,17 +235,6 @@ function App() {
               </>
             )}
             <button onClick={handleFilter}>Filtrar</button>
-          </div>
-        )}
-
-        {activeSection === "home" && (
-          <div className="home-container">
-            <h1 className="home-title">Bem-vindo ao seu Dashboard!</h1>
-            <p className="home-description">
-              Aqui você pode visualizar e filtrar licitações de acordo com os
-              critérios desejados. Use a barra lateral para navegar entre as
-              seções.
-            </p>
           </div>
         )}
 

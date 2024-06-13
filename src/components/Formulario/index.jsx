@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { FormContainer, FormLabel, FormInput, FormButton, ErrorMessage, SuccessMessage } from './styles';
+import {
+  FormContainer,
+  FormLabel,
+  FormInput,
+  FormButton,
+  ErrorMessage,
+  SuccessMessage
+} from './styles';
 
 const Formulario = () => {
   const [imagem, setImagem] = useState(null);
   const [nome, setNome] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false); // Adicionando estado para sucesso
+  const [success, setSuccess] = useState(false);
 
   const handleImagemChange = (event) => {
     setImagem(event.target.files[0]);
@@ -18,7 +25,7 @@ const Formulario = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     if (!imagem || !nome) {
       setError("Por favor, preencha todos os campos.");
       return;
@@ -35,7 +42,10 @@ const Formulario = () => {
         },
       });
       console.log(response.data);
-      setSuccess(true); // Definindo sucesso como verdadeiro
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000); 
     } catch (error) {
       console.error("Erro ao enviar os dados:", error);
     }

@@ -32,27 +32,29 @@ body {
 }
 
 .home-title {
-  font-size: 2.5rem;
-  color: #EFE0C5;
-  margin-bottom: 20px;
+  font-size: 2em;
+  color: #204263;
+  margin-top: 20px;
 }
 
 .home-description {
   font-size: 1.2rem;
   color: #EFE0C5;
+  margin-top: 10px;
 }
 
-.no-results{
-display: flex;
-flex-direction: column;
-align-items: center;
-color: #EFE0C5;
-font-size: 30px;
+.no-results {
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.2em;
 }
 
 .filter-container {
   margin-top: 30px;
+  margin-left: 850px;
   display: flex;
+  width: 30%;
   flex-direction: column;
   align-items: center;
   background-color: #204263;
@@ -64,36 +66,31 @@ font-size: 30px;
 }
 
 .filter-container label {
-  margin: 10px;
-  font-size: 18px;
-  color: #EFE0C5; 
-
+  display: block;
+  margin: 10px 0;
 }
 
 .filter-container input {
-  padding: 10px;
-  margin: 5px;
-  font-size: 16px;
-  border: 1px solid #ccc; 
-  border-radius: 5px;
+  margin-left: 10px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .filter-container button {
   margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 16px;
-  background-color: #007bff;
+  padding: 10px 20px;
+  background-color: #1e3050;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-}
 
-.filter-container button:hover {
-  background-color: #0056b3;
+  &:hover {
+    background-color: #04183d;
+  }
 }
-
 @media (max-width: 768px) {
   .App {
     margin-left: 0;

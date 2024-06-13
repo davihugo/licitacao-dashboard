@@ -8,7 +8,8 @@ import {
   YAxis,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Cell
 } from "recharts";
 import {
   DashboardContainer,
@@ -22,6 +23,8 @@ import {
   PaginationButton,
   PageInfo
 } from "./styles";
+
+const COLORS = ["#000080", "#375d37", "#3d2b1f", "#cd9dcd"];
 
 const Dashboard = ({ licitacoes, activeSection }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,6 +71,7 @@ const Dashboard = ({ licitacoes, activeSection }) => {
   const somaData = Object.keys(somaValoresPorAno).map((ano) => ({
     ano,
     total: somaValoresPorAno[ano],
+    
   }));
 
   const statusData = Object.keys(statusPorAno).map((status) => ({
@@ -75,9 +79,10 @@ const Dashboard = ({ licitacoes, activeSection }) => {
     quantidade: statusPorAno[status],
   }));
 
-  const unidadeData = Object.keys(licitacoesPorUnidade).map((unidade) => ({
+  const unidadeData = Object.keys(licitacoesPorUnidade).map((unidade, index) => ({
     unidade,
     quantidade: licitacoesPorUnidade[unidade],
+    fill:COLORS[index%COLORS.length]
   }));
 
   const formatYAxis = (tickItem) => {
@@ -117,25 +122,30 @@ const Dashboard = ({ licitacoes, activeSection }) => {
                   <YAxis tickFormatter={formatYAxis} />
                   <Tooltip formatter={(value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} />
                   <Legend />
-                  <Bar dataKey='total' fill='#176848' />
+                  <Bar dataKey='total' fill='#5a85aa' />
                 </BarChart>
               </ResponsiveContainer>
               <h2>Quantidade de Licitações por Unidade</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
+<ResponsiveContainer width="100%" height={300}>
+  <PieChart>
+  <Pie
                     data={unidadeData}
-                    dataKey='quantidade'
-                    nameKey='unidade'
-                    cx='50%'
-                    cy='50%'
+                    dataKey="quantidade"
+                    nameKey="unidade"
+                    cx="50%"
+                    cy="50%"
                     outerRadius={100}
-                    fill='#5225AF'
+                    fill="#8884d8"
                     label
-                  />
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+                    paddingAngle={7}
+                  >
+                    {unidadeData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+    <Tooltip />
+  </PieChart>
+</ResponsiveContainer>
             </>
           )}
           {activeSection === 'buscar-status-licitacao' && (
@@ -147,7 +157,7 @@ const Dashboard = ({ licitacoes, activeSection }) => {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar name='Quantidade' dataKey='quantidade' fill='#176848' />
+                  <Bar name='Quantidade' dataKey='quantidade' fill='#5a85aa' />
                 </BarChart>
               </ResponsiveContainer>
             </>

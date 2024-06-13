@@ -1,11 +1,10 @@
 import React from "react";
-import { Container } from "./styles";
-import { FaBars } from "react-icons/fa";
+import { Container, Logo } from "./styles";
 
 const Header = () => {
   return (
     <Container>
-      
+      <Logo>Dashboard</Logo>
     </Container>
   );
 };

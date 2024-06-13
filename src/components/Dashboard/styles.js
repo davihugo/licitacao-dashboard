@@ -5,7 +5,7 @@ export const DashboardContainer = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  background-color: #e8f5e9;
+  background-color: #1A202C;
   min-height: 100vh;
   margin-left: 200px;
   border-radius: 18px;

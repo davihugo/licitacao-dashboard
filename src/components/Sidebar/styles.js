@@ -24,8 +24,7 @@ export const Container = styled.div`
     transform: translateX(0);
   }
 
-  font-size: 30px;
-
+  
 `;
 
 export const MenuIcon = styled.div`
